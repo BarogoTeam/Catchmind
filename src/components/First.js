@@ -1,5 +1,5 @@
 import React, { Component } from 'react'
-import {CmCanvas} from "./CmCanvas";
+import {CmCanvas} from "./Game/CmCanvas";
 
 const INITIAL_TIME = 5;
 

@@ -26,27 +26,27 @@ io.on('connection', (socket) => {
 
   socket.on('join-room', (msg) => {
     console.log('join room', msg)
-    socket.join(msg.roomid)
-    io.to(msg.roomid).emit('chat-msg',{name:'',message:`${msg.roomid} 에 접속`})
+    socket.join(msg.roomId)
+    io.to(msg.roomId).emit('chat-msg',{name:'',message:`${msg.roomId} 에 접속`})
   })
 
   socket.on('create-room', (msg) => {
     console.log('create room', msg)
-    let roomid = new Date().getTime();
-    io.emit('chat-msg', roomid)
-    io.to(roomid).emit('chat-msg',{name:'',message:`${msg.roomid} 에 접속`})
+    let roomId = new Date().getTime();
+    io.emit('chat-msg', roomId)
+    io.to(roomId).emit('chat-msg',{name:'',message:`${msg.roomId} 에 접속`})
   })
 
   socket.on('chat-msg', (msg) => {
     msg.id = socket.client.id;
     console.log('chat-msg', msg)
-    io.to(msg.roomid).emit('chat-msg', msg)
+    io.to(msg.roomId).emit('chat-msg', msg)
   })
 
   socket.on('game-info', (msg) => {
     console.log('game-info', msg)
     if(msg.type === 'end'){
-      io.to(msg.roomid).emit('game-info', {
+      io.to(msg.roomId).emit('game-info', {
         type: 'start',
         answer: '',
         drawer: '',
@@ -54,8 +54,21 @@ io.on('connection', (socket) => {
       })
     }
     else{
-      io.to(msg.roomid).emit('game-info', msg)
+      io.to(msg.roomId).emit('game-info', msg)
     }
   })
 
+  socket.on('get-players', (msg, ack) => {
+    console.log('get players', msg);
+    // TODO(jylee) use RoomManager.getPlayers()
+    io.to(msg.roomId).clients((err, clients) => {
+      if (err) throw err;
+      // TODO (jylee): ack(client => clients.map(SocketService.get(client)))
+      ack(clients);
+    })
+  })
+
+  socket.on('ready', (msg) => {
+
+  });
 })

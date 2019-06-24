@@ -92,5 +92,3 @@ typings/
 
 # MAC Temp folder
 .DS_Store
-
-package-lock.json
