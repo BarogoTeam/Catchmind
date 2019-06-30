@@ -21,7 +21,7 @@ class RoomProvider extends Component {
 
         this.sendMessage = this.sendMessage.bind(this);
         this.handleReceiveMessage = this.handleReceiveMessage.bind(this);
-        this.handleReceivePlayers = this.handleReceivePlayers.bind(this);
+        this.handleReceiveRoomState = this.handleReceiveRoomState.bind(this);
     }
 
     componentDidMount() {
@@ -33,7 +33,7 @@ class RoomProvider extends Component {
         // register event handlers related with room context.
         socket.on('chat-msg', this.handleReceiveMessage);
 
-        socket.on('update-players', this.handleReceivePlayers);
+        socket.on('update-room-state', this.handleReceiveRoomState);
 
         this.sendMessage('na wat da')
         this.ready();
@@ -49,8 +49,8 @@ class RoomProvider extends Component {
         console.log(msg)
     }
 
-    handleReceivePlayers(players) {
-        console.log(players)
+    handleReceiveRoomState(roomState) {
+        console.log(roomState)
     }
 
     sendMessage(content) {

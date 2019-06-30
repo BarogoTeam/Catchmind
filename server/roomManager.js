@@ -7,7 +7,7 @@ class RoomManager {
 
     addListeners(socket) {
         socket.on('join-room', (msg) => {
-            this.rooms[msg.roomId] = this.rooms[msg.roomId] || new Room(msg.roomId);
+            this.rooms[msg.roomId] = this.rooms[msg.roomId] || new Room(socket, msg.roomId);
             const room = this.rooms[msg.roomId];
             room.join(socket);
         })
@@ -19,19 +19,12 @@ class RoomManager {
         // })
 
 
-        socket.on('get-players', (msg, ack) => {
-            console.log('get players', msg);
-            const room = this.rooms[msg.roomId];
+        // socket.on('get-players', (msg, ack) => {
+        //     console.log('get players', msg);
+        //     const room = this.rooms[msg.roomId];
 
-            ack(room.players);
-
-            // // TODO(jylee) use RoomManager.getPlayers()
-            // socket.to(msg.roomId).clients((err, clients) => {
-            // if (err) throw err;
-            // // TODO (jylee): ack(client => clients.map(SocketService.get(client)))
-            // ack(clients);
-            // })
-        })
+        //     ack(room.players);
+        // })
     }
 
     // joinUser(roomid,id){

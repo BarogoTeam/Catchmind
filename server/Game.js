@@ -4,13 +4,17 @@
  */
 
 class Game {
-    constructor(sockets) {
+    constructor(players) {
         this.state = {
             status: 'PLAYING',
             painter: '',
             answer: '',
             timeout: 120,
         }
+    }
+
+    addListeners(socket) {
+
     }
 
 
