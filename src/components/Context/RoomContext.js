@@ -21,7 +21,7 @@ class RoomProvider extends Component {
 
         this.sendMessage = this.sendMessage.bind(this);
         this.handleReceiveMessage = this.handleReceiveMessage.bind(this);
-        this.getPlayers = this.getPlayers.bind(this);
+        this.handleReceivePlayers = this.handleReceivePlayers.bind(this);
     }
 
     componentDidMount() {
@@ -29,12 +29,13 @@ class RoomProvider extends Component {
         const { socket } = socketStore;
 
         socket.emit('join-room', { roomId });
-        // register event handlers related with room context.
 
+        // register event handlers related with room context.
         socket.on('chat-msg', this.handleReceiveMessage);
 
+        socket.on('update-players', this.handleReceivePlayers);
+
         this.sendMessage('na wat da')
-        this.getPlayers();
         this.ready();
     }
 
@@ -48,20 +49,15 @@ class RoomProvider extends Component {
         console.log(msg)
     }
 
+    handleReceivePlayers(players) {
+        console.log(players)
+    }
+
     sendMessage(content) {
         const { socketStore, roomId } = this.props;
         const { socket } = socketStore;
 
         socket.emit('chat-msg', { roomId, content})
-    }
-
-    getPlayers() {
-        const { socketStore, roomId } = this.props;
-        const { socket } = socketStore;
-
-        socket.emit('get-players', { roomId }, players => {
-            console.log(players);
-        })
     }
 
     ready() {
