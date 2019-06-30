@@ -2,25 +2,27 @@ const _ = require('lodash');
 const Haikunator = require('haikunator');
 const haikunator = new Haikunator();
 
+const Game = require('./Game').default;
+
 class Room {
-    constructor(socket, roomId) {
+    constructor(roomId) {
         this.id = roomId;
         this.id2socket = {};
-        this.socket = socket;
+        this.game = null;
         this.state = {
             players: {},
-            game: null,
             status: 'WAITING', // WATING => CLOSED
+            createdAt: new Date(),
         }
     }
 
-    setState(state) {
+    setState(nextState) {
         this.state = {
             ...this.state,
-            ...state,
+            ...nextState,
         }
 
-        this.notifyRoomState(this.socket);
+        this.notifyRoomState(_.find(this.id2socket));
     }
 
     addListeners(socket) {
@@ -46,25 +48,33 @@ class Room {
         socket.on('ready', (msg) => {
             const { players } = this.state;
             const player = players[socket.id];
-            this.setState({
-                players: {
-                    ...players,
-                    [socket.id]: {
-                        ...player,
-                        status: player.status === 'READY' ? 'NOT_READY' : 'READY',
-                    }
+            const nextPlayers = {
+                ...players,
+                [socket.id]: {
+                    ...player,
+                    status: player.status === 'READY' ? 'NOT_READY' : 'READY',
                 }
+            }
+            this.setState({
+                players: nextPlayers,
             });
 
-            if (_.every(players, ['status', 'READY'])) {
+            socket.to(this.id).emit('chat-msg', {name: '', message: `${this.id}에서 ${player.name}이 준비했습니다.`})
+            socket.emit('chat-msg', {name: '', message: `${this.id}에서 ${player.name}이 준비했습니다.`})
+        if (_.size(nextPlayers) === 2 && _.every(nextPlayers, ['status', 'READY'])) {
                 console.log('All of us are ready, lets start a game!');
-                socket.to(this.id).emit('chat-msg', {name: '', message: `${this.id}에서 ${player.name}이 준비했습니다.`})
-                socket.emit('chat-msg', {name: '', message: `${this.id}에서 ${player.name}이 준비했습니다.`})
-            } else {
-                socket.to(this.id).emit('chat-msg', {name: '', message: `${this.id}에서 ${player.name}이 준비했습니다.`})
-                socket.emit('chat-msg', {name: '', message: `${this.id}에서 ${player.name}이 준비했습니다.`})
+                this.startGame();
             }
         })
+    }
+
+    startGame() {
+        const { players } = this.state;
+
+        this.game = new Game(this.roomId, players, this.id2socket);
+        this.setState({
+            status: 'CLOSED',
+        });
     }
 
     notifyRoomState(socket) {

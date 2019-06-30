@@ -7,7 +7,7 @@ class RoomManager {
 
     addListeners(socket) {
         socket.on('join-room', (msg) => {
-            this.rooms[msg.roomId] = this.rooms[msg.roomId] || new Room(socket, msg.roomId);
+            this.rooms[msg.roomId] = this.rooms[msg.roomId] || new Room(msg.roomId);
             const room = this.rooms[msg.roomId];
             room.join(socket);
         })
