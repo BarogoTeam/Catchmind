@@ -22,7 +22,9 @@ class Room {
             ...nextState,
         }
 
-        this.notifyRoomState(_.find(this.id2socket));
+        const randomSocket = _.find(this.id2socket);
+        if (!randomSocket) return;
+        this.notifyRoomState(randomSocket);
     }
 
     addListeners(socket) {
